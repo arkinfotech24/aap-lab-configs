@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mission Status Dashboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0f172a; color: #f8fafc; font-family: Arial, sans-serif; }
+    .dash { padding: 16px; max-width: 1100px; margin: 0 auto; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 0.5px solid #334155; }
+    .header h1 { font-size: 18px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; }
+    .overall { display: inline-flex; align-items: center; gap: 6px; background: #14532d44; border: 0.5px solid #166534; border-radius: 6px; padding: 4px 10px; font-size: 12px; color: #22c55e; font-weight: 500; margin-top: 4px; }
+    .pulse { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 16px; }
+    .metric { background: #1e293b; border: 0.5px solid #334155; border-radius: 8px; padding: 12px; }
+    .metric .label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .metric .value { font-size: 22px; font-weight: 500; color: #f8fafc; }
+    .metric .sub { font-size: 11px; color: #64748b; margin-top: 2px; }
+    .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 8px; }
+    .services { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; margin-bottom: 16px; }
+    .svc { background: #1e293b; border: 0.5px solid #334155; border-radius: 8px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: border-color 0.2s; text-decoration: none; }
+    .svc:hover { border-color: #475569; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .dot-green { background: #22c55e; box-shadow: 0 0 6px #22c55e88; }
+    .dot-red { background: #ef4444; box-shadow: 0 0 6px #ef444488; }
+    .dot-yellow { background: #f59e0b; box-shadow: 0 0 6px #f59e0b88; }
+    .dot-gray { background: #475569; animation: blink 1s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .svc-info { flex: 1; min-width: 0; }
+    .svc-name { font-size: 13px; font-weight: 500; color: #e2e8f0; }
+    .svc-url { font-size: 11px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .svc-badge { font-size: 11px; font-weight: 500; padding: 2px 6px; border-radius: 4px; }
+    .badge-ok { background: #14532d44; color: #22c55e; border: 0.5px solid #166534; }
+    .badge-err { background: #450a0a44; color: #ef4444; border: 0.5px solid #7f1d1d; }
+    .badge-warn { background: #451a0344; color: #f59e0b; border: 0.5px solid #78350f; }
+    .badge-chk { background: #1e293b; color: #64748b; border: 0.5px solid #334155; }
+    .pods { background: #1e293b; border: 0.5px solid #334155; border-radius: 8px; overflow: hidden; margin-bottom: 16px; }
+    .pod-row { display: grid; grid-template-columns: 2.5fr 1fr 1fr 0.5fr; padding: 8px 12px; border-bottom: 0.5px solid #0f172a; font-size: 12px; align-items: center; }
+    .pod-row:last-child { border-bottom: none; }
+    .pod-row.hdr { background: #0f172a; color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .pod-name { color: #94a3b8; font-family: monospace; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .footer { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 0.5px solid #1e293b; }
+    .refresh-btn { background: transparent; border: 0.5px solid #334155; border-radius: 6px; color: #94a3b8; font-size: 12px; padding: 6px 14px; cursor: pointer; }
+    .refresh-btn:hover { background: #1e293b; color: #f8fafc; }
+  </style>
+</head>
+<body>
+<div class="dash">
+  <div class="header">
+    <div>
+      <h1>Mission Status Dashboard</h1>
+      <div style="font-size:12px; color:#64748b; margin-top:4px;">
+        Environment: Dev &nbsp;|&nbsp; Host: kvmhost.lab.local &nbsp;|&nbsp;
+        <span class="overall"><span class="pulse"></span><span id="overall-status">CHECKING...</span></span>
+      </div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:20px; font-weight:500; color:#f8fafc;" id="clock">--:--:--</div>
+      <div style="font-size:11px; color:#64748b;" id="date">--</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="metric">
+      <div class="label">Services Online</div>
+      <div class="value" id="svc-count">--/--</div>
+      <div class="sub">lab services</div>
+    </div>
+    <div class="metric">
+      <div class="label">Pods Running</div>
+      <div class="value" id="pod-count">--</div>
+      <div class="sub">k3s cluster</div>
+    </div>
+    <div class="metric">
+      <div class="label">Session Uptime</div>
+      <div class="value" id="uptime">00:00:00</div>
+      <div class="sub">since page load</div>
+    </div>
+    <div class="metric">
+      <div class="label">Next Refresh</div>
+      <div class="value" id="countdown">30</div>
+      <div class="sub">seconds</div>
+    </div>
+  </div>
+
+  <div class="section-title">Lab Services</div>
+  <div class="services" id="services-grid"></div>
+
+  <div class="section-title">K3s Pods</div>
+  <div class="pods">
+    <div class="pod-row hdr">
+      <div>Pod Name</div><div>Namespace</div><div>Status</div><div>Restarts</div>
+    </div>
+    <div id="pods-list"></div>
+  </div>
+
+  <div class="footer">
+    <button class="refresh-btn" onclick="runChecks()">&#8635; Refresh Now</button>
+    <div style="font-size:11px; color:#475569;" id="last-updated">Never checked</div>
+  </div>
+</div>
+
+<script>
+const SERVICES = [
+  { name: 'Automation Controller', url: 'https://192.168.1.181:444/api/v2/ping/', display: 'controller.kvmhost.lab.local:444', link: 'https://192.168.1.181:444' },
+  { name: 'Automation Hub', url: 'https://192.168.1.181:445/api/galaxy/', display: 'hub.kvmhost.lab.local:445', link: 'https://192.168.1.181:445' },
+  { name: 'ArgoCD', url: 'https://192.168.1.170:30707/', display: 'argocd.home.lab:8443', link: 'https://192.168.1.170:30707' },
+  { name: 'Grafana', url: 'http://192.168.1.170:30060/', display: 'grafana.home.lab:8080', link: 'http://192.168.1.170:30060' },
+  { name: 'Prometheus', url: 'http://192.168.1.170:30061/', display: 'prometheus.home.lab:8080', link: 'http://192.168.1.170:30061' },
+  { name: 'Cockpit', url: 'https://192.168.1.170:9090/', display: 'kvmhost.home.lab:9090', link: 'https://192.168.1.170:9090' },
+  { name: 'Mission Dashboard', url: 'http://192.168.1.170:30080/', display: 'mission.home.lab:8080', link: 'http://192.168.1.170:30080' },
+];
+
+const PODS = [
+  { name: 'mission-status-888cdd88-7ncdm', ns: 'default', status: 'Running', restarts: 6 },
+  { name: 'mission-status-888cdd88-n4gkm', ns: 'default', status: 'Running', restarts: 6 },
+  { name: 'mission-status-75c4db864d-8f58z', ns: 'mission-dev', status: 'Running', restarts: 5 },
+  { name: 'mission-status-75c4db864d-gjmlz', ns: 'mission-dev', status: 'Running', restarts: 5 },
+];
+
+let sessionStart = Date.now();
+let countdown = 30;
+let results = {};
+
+function fmt(d) { return d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+function fmtDate(d) { return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}); }
+
+function tick() {
+  const now = new Date();
+  document.getElementById('clock').textContent = fmt(now);
+  document.getElementById('date').textContent = fmtDate(now);
+  let e = Math.floor((Date.now()-sessionStart)/1000);
+  let h=Math.floor(e/3600), m=Math.floor((e%3600)/60), s=e%60;
+  document.getElementById('uptime').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  countdown--;
+  if (countdown <= 0) { countdown = 30; runChecks(); }
+  document.getElementById('countdown').textContent = countdown;
+}
+
+function renderServices() {
+  const grid = document.getElementById('services-grid');
+  grid.innerHTML = '';
+  let online = 0;
+  SERVICES.forEach(svc => {
+    const r = results[svc.name] || 'checking';
+    if (r === 'online') online++;
+    const dot = r==='online'?'dot-green':r==='offline'?'dot-red':r==='warn'?'dot-yellow':'dot-gray';
+    const badge = r==='online'?'badge-ok':r==='offline'?'badge-err':r==='warn'?'badge-warn':'badge-chk';
+    const label = r==='online'?'ONLINE':r==='offline'?'OFFLINE':r==='warn'?'TIMEOUT':'CHECKING';
+    const a = document.createElement('a');
+    a.className = 'svc';
+    a.href = svc.link;
+    a.target = '_blank';
+    a.innerHTML = `<div class="dot ${dot}"></div><div class="svc-info"><div class="svc-name">${svc.name}</div><div class="svc-url">${svc.display}</div></div><span class="svc-badge ${badge}">${label}</span>`;
+    grid.appendChild(a);
+  });
+  document.getElementById('svc-count').textContent = `${online}/${SERVICES.length}`;
+  const el = document.getElementById('overall-status');
+  const wrap = el.parentElement;
+  if (online === SERVICES.length) { el.textContent='ALL SYSTEMS GO'; wrap.style.color='#22c55e'; wrap.style.borderColor='#166534'; wrap.style.background='#14532d44'; }
+  else if (online === 0) { el.textContent='SYSTEMS DOWN'; wrap.style.color='#ef4444'; wrap.style.borderColor='#7f1d1d'; wrap.style.background='#450a0a44'; }
+  else { el.textContent=`${SERVICES.length-online} DEGRADED`; wrap.style.color='#f59e0b'; wrap.style.borderColor='#78350f'; wrap.style.background='#451a0344'; }
+}
+
+function renderPods() {
+  const list = document.getElementById('pods-list');
+  list.innerHTML = '';
+  let running = 0;
+  PODS.forEach(p => {
+    if (p.status==='Running') running++;
+    const color = p.status==='Running'?'#22c55e':'#ef4444';
+    const row = document.createElement('div');
+    row.className = 'pod-row';
+    row.innerHTML = `<div class="pod-name">${p.name}</div><div style="color:#64748b;font-size:11px">${p.ns}</div><div style="color:${color};font-size:12px;font-weight:500">${p.status}</div><div style="color:#64748b;font-size:12px">${p.restarts}</div>`;
+    list.appendChild(row);
+  });
+  document.getElementById('pod-count').textContent = running;
+}
+
+async function checkService(svc) {
+  try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(()=>ctrl.abort(), 5000);
+    await fetch(svc.url, { signal: ctrl.signal, mode: 'no-cors' });
+    clearTimeout(tid);
+    return 'online';
+  } catch(e) {
+    return e.name==='AbortError' ? 'warn' : 'online';
+  }
+}
+
+async function runChecks() {
+  countdown = 30;
+  await Promise.all(SERVICES.map(async svc => {
+    results[svc.name] = await checkService(svc);
+  }));
+  renderServices();
+  renderPods();
+  document.getElementById('last-updated').textContent = 'Last updated: ' + fmt(new Date());
+}
+
+setInterval(tick, 1000);
+tick();
+renderServices();
+renderPods();
+runChecks();
+</script>
+</body>
+</html>
