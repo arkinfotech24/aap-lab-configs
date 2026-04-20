@@ -1,0 +1,109 @@
+# ============================
+# Automation Controller
+# ============================
+[automationcontroller]
+kvmhost.lab.local ansible_host=192.168.1.170
+
+[automationcontroller:vars]
+peers=execution_nodes
+
+# ============================
+# Execution Nodes (none for single-node)
+# ============================
+[execution_nodes]
+
+# ============================
+# Automation Hub
+# ============================
+[automationhub]
+kvmhost.lab.local
+
+# ============================
+# Database (managed Postgres)
+# ============================
+[database]
+kvmhost.lab.local
+
+# ============================
+# SSO (not used)
+# ============================
+[sso]
+
+# ============================
+# Global Variables
+# ============================
+[all:vars]
+
+# ----------------------------
+# SSH Connection
+# ----------------------------
+ansible_user=sysadmin
+ansible_ssh_private_key_file=/home/sysadmin/.ssh/id_ed25519
+ansible_become=true
+ansible_become_method=sudo
+
+# ----------------------------
+# Admin Password
+# ----------------------------
+admin_password=CHANGEME
+
+# ----------------------------
+# Controller Database
+# ----------------------------
+pg_host='localhost'
+pg_port=5432
+pg_database='awx'
+pg_username='awx'
+pg_password=CHANGEME
+pg_sslmode='prefer'
+
+# ----------------------------
+# Red Hat Registry Credentials
+# ----------------------------
+registry_url='registry.redhat.io'
+registry_username='niyiallen-1'
+registry_password=CHANGEME
+
+# ----------------------------
+# Receptor
+# ----------------------------
+receptor_listener_port=27199
+
+# ----------------------------
+# Automation Hub
+# ----------------------------
+enable_pulp_registry=true
+automationhub_admin_password=CHANGEME
+automationhub_main_url='https://hub.kvmhost.lab.local:445'
+automationhub_api_url='https://hub.kvmhost.lab.local:445/api/galaxy/'
+automationhub_registry_url=https://hub.kvmhost.lab.local:445
+automationhub_pg_host='localhost'
+automationhub_pg_port=5432
+automationhub_pg_database='automationhub'
+automationhub_pg_username='automationhub'
+automationhub_pg_password=CHANGEME
+automationhub_pg_sslmode='prefer'
+
+# ----------------------------
+# Hostnames
+# ----------------------------
+controller_hostname='controller.kvmhost.lab.local'
+hub_hostname='hub.kvmhost.lab.local'
+automationedacontroller_hostname='eda.kvmhost.lab.local'
+
+# ----------------------------
+# EDA Controller
+# ----------------------------
+automationedacontroller_admin_password=CHANGEME
+automationedacontroller_pg_host='localhost'
+automationedacontroller_pg_port=5432
+automationedacontroller_pg_database='automationedacontroller'
+automationedacontroller_pg_username='automationedacontroller'
+automationedacontroller_pg_password=CHANGEME
+automationedacontroller_pg_sslmode='prefer'
+
+# ----------------------------
+# SSO (unused)
+# ----------------------------
+sso_keystore_password=CHANGEME
+sso_console_admin_password=CHANGEME

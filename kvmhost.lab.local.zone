@@ -1,0 +1,12 @@
+$TTL 86400
+@   IN  SOA ns1.kvmhost.lab.local. admin.kvmhost.lab.local. (
+        2026041904 ; Serial
+        3600       ; Refresh
+        1800       ; Retry
+        604800     ; Expire
+        86400 )    ; Minimum TTL
+@       IN  NS      ns1.kvmhost.lab.local.
+ns1     IN  A       192.168.1.10
+controller  IN  A   192.168.1.181
+hub         IN  A   192.168.1.181
+eda         IN  A   192.168.1.170

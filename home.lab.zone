@@ -1,0 +1,47 @@
+$TTL 86400
+@   IN  SOA ns1.home.lab. admin.home.lab. (
+        2026041803 ; Serial (increment on every change)
+        3600       ; Refresh
+        1800       ; Retry
+        604800     ; Expire
+        86400 )    ; Minimum TTL
+
+; Name Server
+@       IN  NS      ns1.home.lab.
+ns1     IN  A       192.168.1.10
+
+; =========================
+; CORE INFRA NODES
+; =========================
+
+bootstrap   IN  A   192.168.1.160
+
+master-1    IN  A   192.168.1.170
+master-2    IN  A   192.168.1.171
+master-3    IN  A   192.168.1.172
+
+worker-1    IN  A   192.168.1.180
+worker-2    IN  A   192.168.1.181
+
+repo        IN  A   192.168.1.150
+
+servera     IN  A   192.168.1.190
+serverb     IN  A   192.168.1.191
+
+kvmhost     IN  A       192.168.1.170
+api         IN  A       192.168.1.170
+argocd      IN  A       192.168.1.170
+grafana     IN  A       192.168.1.170
+prometheus  IN  A       192.168.1.170
+mission     IN  A       192.168.1.170
+controller  IN  A       192.168.1.170
+hub         IN  A       192.168.1.181
+
+
+; =========================
+; OPTIONAL SERVICE ALIASES
+; =========================
+
+registry    IN  CNAME repo.home.lab.
+storage     IN  CNAME servera.home.lab.
+
