@@ -45,7 +45,7 @@ ansible_become_method=sudo
 # ----------------------------
 # Admin Password
 # ----------------------------
-admin_password=CHANGEME
+admin_password='CHANGE_ME'
 
 # ----------------------------
 # Controller Database
@@ -54,15 +54,15 @@ pg_host='localhost'
 pg_port=5432
 pg_database='awx'
 pg_username='awx'
-pg_password=CHANGEME
+pg_password='CHANGE_ME'
 pg_sslmode='prefer'
 
 # ----------------------------
 # Red Hat Registry Credentials
 # ----------------------------
 registry_url='registry.redhat.io'
-registry_username='niyiallen-1'
-registry_password=CHANGEME
+registry_username='YOUR_RH_USERNAME'
+registry_password='CHANGE_ME'
 
 # ----------------------------
 # Receptor
@@ -73,7 +73,7 @@ receptor_listener_port=27199
 # Automation Hub
 # ----------------------------
 enable_pulp_registry=true
-automationhub_admin_password=CHANGEME
+automationhub_admin_password='CHANGE_ME'
 automationhub_main_url='https://hub.kvmhost.lab.local:445'
 automationhub_api_url='https://hub.kvmhost.lab.local:445/api/galaxy/'
 automationhub_registry_url=https://hub.kvmhost.lab.local:445
@@ -81,7 +81,7 @@ automationhub_pg_host='localhost'
 automationhub_pg_port=5432
 automationhub_pg_database='automationhub'
 automationhub_pg_username='automationhub'
-automationhub_pg_password=CHANGEME
+automationhub_pg_password='CHANGE_ME'
 automationhub_pg_sslmode='prefer'
 
 # ----------------------------
@@ -94,16 +94,16 @@ automationedacontroller_hostname='eda.kvmhost.lab.local'
 # ----------------------------
 # EDA Controller
 # ----------------------------
-automationedacontroller_admin_password=CHANGEME
+automationedacontroller_admin_password='CHANGE_ME'
 automationedacontroller_pg_host='localhost'
 automationedacontroller_pg_port=5432
 automationedacontroller_pg_database='automationedacontroller'
 automationedacontroller_pg_username='automationedacontroller'
-automationedacontroller_pg_password=CHANGEME
+automationedacontroller_pg_password='CHANGE_ME'
 automationedacontroller_pg_sslmode='prefer'
 
 # ----------------------------
 # SSO (unused)
 # ----------------------------
-sso_keystore_password=CHANGEME
-sso_console_admin_password=CHANGEME
+sso_keystore_password=''
+sso_console_admin_password='CHANGE_ME'
