@@ -1,0 +1,5 @@
+## Overview
+This dashboard provides a quick visual of system readiness and service health. It is deployed via Kubernetes and updated through GitOps automation.
+## Related Repository
+- [mission-status-app](https://github.com/arkinfotech24/mission-status-app)
+                       
